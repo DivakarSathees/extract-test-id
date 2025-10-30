@@ -42,20 +42,24 @@ exports.extractTestID = async (filepath, url, email, password, course, module, t
 async function loginAndGetLocalStorage(url, USEREMAIL, PASSWORD, COURSE, MODULE, TESTNAME, UEmails) {
 
     const browser = await puppeteer.launch({
-        headless: true,
+        // headless: true,
         args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--remote-debugging-port=9222',
-            '--start-maximized',
-            '--ignore-certificate-errors'
+            // '--no-sandbox',
+            // '--disable-setuid-sandbox',
+            // '--disable-dev-shm-usage',
+            // '--remote-debugging-port=9222',
+            // '--start-maximized',
+            // '--ignore-certificate-errors',
+              "--disable-setuid-sandbox",
+            "--no-sandbox",
+            "--single-process",
+            "--no-zygote",
         ],
         executablePath:
           process.env.NODE_ENV === "production"
             ? process.env.PUPPETEER_EXECUTABLE_PATH
             : puppeteer.executablePath(),
-        protocolTimeout: 120000,
+        // protocolTimeout: 120000,
 
       });
 
