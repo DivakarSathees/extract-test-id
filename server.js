@@ -6,6 +6,7 @@ const xlsx = require("xlsx");
 const cors = require("cors");
 const app = express();
 const os = require('os');
+const PQueue = require('p-queue-cjs').default || require('p-queue-cjs');
 const { extractTestID } = require('./extractTestID');
 
 const port = 3000;
@@ -14,6 +15,13 @@ const upload = multer({ dest: "uploads/" });
 app.use(cors({ origin: ['https://forntend-weightagesplit-1.onrender.com','http://localhost:4200'] }));
 
 app.use(express.json());
+
+// ✅ Create a concurrency-limited queue (1 at a time to avoid EBUSY)
+const queue = new PQueue({ concurrency: 1 });
+
+// Simple delay helper
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 
 let driver; // Global browser session
 // const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'selenium-user-data-'));
@@ -53,7 +61,7 @@ app.post('/visit', upload.single("file"), async (req, res) => {
   // fs.unlinkSync(filePath);
   try {
 
-    const { testIds: ids, token: extractedToken } = await extractTestID(
+    const { testIds: ids, token: extractedToken } = await  queue.add(() => extractTestID(
       filePath,
       LOGIN_URL,
       USEREMAIL,
@@ -61,7 +69,7 @@ app.post('/visit', upload.single("file"), async (req, res) => {
       COURSE,
       MODULE,
       TESTNAME
-    );
+    ));
 
     testIds = ids;
     token = token || extractedToken;

@@ -3,7 +3,13 @@ const xlsx = require("xlsx");
 const fs = require("fs");
 require("dotenv").config();
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+// const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+// ✅ Create a concurrency-limited queue (1 at a time to avoid EBUSY)
+// const queue = new PQueue({ concurrency: 1 });
+
+// Simple delay helper
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 
 exports.extractTestID = async (filepath, url, email, password, course, module, testname) => {
     try {
@@ -42,24 +48,20 @@ exports.extractTestID = async (filepath, url, email, password, course, module, t
 async function loginAndGetLocalStorage(url, USEREMAIL, PASSWORD, COURSE, MODULE, TESTNAME, UEmails) {
 
     const browser = await puppeteer.launch({
-        // headless: true,
+        headless: false,
         args: [
-            // '--no-sandbox',
-            // '--disable-setuid-sandbox',
-            // '--disable-dev-shm-usage',
-            // '--remote-debugging-port=9222',
-            // '--start-maximized',
-            // '--ignore-certificate-errors',
-              "--disable-setuid-sandbox",
-            "--no-sandbox",
-            "--single-process",
-            "--no-zygote",
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--remote-debugging-port=9222',
+            '--start-maximized',
+            '--ignore-certificate-errors'
         ],
         executablePath:
           process.env.NODE_ENV === "production"
             ? process.env.PUPPETEER_EXECUTABLE_PATH
             : puppeteer.executablePath(),
-        // protocolTimeout: 120000,
+        protocolTimeout: 120000,
 
       });
 
@@ -100,7 +102,8 @@ async function loginAndGetLocalStorage(url, USEREMAIL, PASSWORD, COURSE, MODULE,
 
         console.log("Logging in...7");
         // await page.screenshot({ path: 'screenshot_course_search.png', fullPage: true });
-
+        await page.click("input[placeholder='Enter course name to search']", { clickCount: 3 });
+        await page.keyboard.press('Backspace');
         
         await page.type("input[placeholder='Enter course name to search']", COURSE);
 
@@ -129,7 +132,9 @@ async function loginAndGetLocalStorage(url, USEREMAIL, PASSWORD, COURSE, MODULE,
 
         }, COURSE);
         
-        if (!courseClicked) console.log("❌ Course not found or click failed.");
+        if (!courseClicked) {console.log("❌ Course not found or click failed.")
+            throw new Error("Course not found or click failed");
+        }
         else console.log("✅ Course clicked.");
 
 
@@ -162,7 +167,9 @@ async function loginAndGetLocalStorage(url, USEREMAIL, PASSWORD, COURSE, MODULE,
             }
             return false;
         }, TESTNAME);
-        if (!testClicked) console.log("❌ Test Result button not found.");
+        if (!testClicked) {console.log("❌ Test Result button not found.")
+            throw new Error("Test Result button not found");
+        }
         else console.log("✅ Test Result clicked.");
     } catch (error) {
 

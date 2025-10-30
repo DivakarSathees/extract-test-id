@@ -14,6 +14,8 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "multer": "^2.0.2",
+    "p-queue": "^8.1.1",
+    "p-queue-cjs": "^7.3.4",
     "puppeteer": "^24.27.0",
     "xlsx": "^0.18.5"
   }
