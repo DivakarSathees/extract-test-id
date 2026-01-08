@@ -13,7 +13,8 @@ const { extractTestID } = require('./extractTestID');
 const port = 3000;
 const upload = multer({ dest: "uploads/" });
 
-app.use(cors({ origin: ['https://forntend-weightagesplit-1.onrender.com','http://localhost:4200'] }));
+app.use(cors({ origin: ['https://forntend-weightagesplit-1.onrender.com', 'http://localhost:4200'] }));
+app.use(express.static('public'));
 
 app.use(express.json());
 
@@ -62,7 +63,7 @@ app.post('/visit', upload.single("file"), async (req, res) => {
   // fs.unlinkSync(filePath);
   try {
 
-    const { testIds: ids, token: extractedToken } = await  queue.add(() => extractTestID(
+    const { testIds: ids, token: extractedToken } = await queue.add(() => extractTestID(
       filePath,
       LOGIN_URL,
       USEREMAIL,
@@ -74,16 +75,31 @@ app.post('/visit', upload.single("file"), async (req, res) => {
 
     testIds = ids;
     token = token || extractedToken;
-    res.send({ testIds, token }); // Send the test IDs as a response
-    
-    } catch (error) {
+
+    // Create new Excel workbook with results
+    const resultData = testIds.map(t => ({
+      // "User Email": t.email,
+      "Test ID": t.testId
+    }));
+
+    const newWs = xlsx.utils.json_to_sheet(resultData);
+    const newWb = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(newWb, newWs, "Results");
+
+    const buffer = xlsx.write(newWb, { type: 'buffer', bookType: 'xlsx' });
+
+    res.setHeader('Content-Disposition', 'attachment; filename="results.xlsx"');
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.send(buffer);
+
+  } catch (error) {
     console.error("Error making POST request to /visit API:", error.message);
     res.status(500).send({ error: "Failed to fetch test IDs from the API." });
     return;
-    } 
-    // finally {
-    // fs.unlinkSync(filePath);
-    // }
+  }
+  // finally {
+  // fs.unlinkSync(filePath);
+  // }
 });
 
 app.get('/screenshot', (req, res) => {

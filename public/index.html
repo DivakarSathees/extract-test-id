@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ID Extractor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Test ID Extractor</h1>
+            <p>Upload your Excel file and extract test IDs effortlessly.</p>
+        </header>
+
+        <form id="extractForm">
+            <div class="form-group file-upload">
+                <input type="file" id="file" name="file" accept=".xlsx, .xls" required>
+                <label for="file" class="file-label">
+                    <span class="file-icon">📂</span>
+                    <span class="file-text">Choose Excel File</span>
+                </label>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="LOGIN_URL">Login URL</label>
+                    <input type="url" id="LOGIN_URL" name="LOGIN_URL" placeholder="https://example.com/login" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="USEREMAIL">User Email</label>
+                    <input type="email" id="USEREMAIL" name="USEREMAIL" placeholder="admin@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="PASSWORD">Password</label>
+                    <input type="password" id="PASSWORD" name="PASSWORD" placeholder="bv@123" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="COURSE">Course Name</label>
+                    <input type="text" id="COURSE" name="COURSE" placeholder="Full Stack Development" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="MODULE">Module Number</label>
+                    <input type="number" id="MODULE" name="MODULE" placeholder="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="TESTNAME">Test Name</label>
+                    <input type="text" id="TESTNAME" name="TESTNAME" placeholder="Assessment 1" required>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span class="btn-text">Extract Data</span>
+                <span class="loader hidden"></span>
+            </button>
+        </form>
+
+        <div id="statusMessage"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
